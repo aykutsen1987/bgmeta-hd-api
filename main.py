@@ -10,28 +10,27 @@ import tflite_runtime.interpreter as tflite
 
 app = FastAPI()
 
-MODEL_URL = "https://huggingface.co/aykutsen1987/bgmeta-u2net/blob/main/u2net.tflite"
+# Doğrudan indirilebilir Hugging Face linki
+MODEL_URL = "https://huggingface.co/aykutsen1987/bgmeta-u2net/resolve/main/u2net.tflite"
 MODEL_PATH = "u2net.tflite"
 
 interpreter = None
 input_details = None
 output_details = None
 
-
 def download_model():
     if not os.path.exists(MODEL_PATH):
         print("Downloading model...")
         r = requests.get(MODEL_URL, stream=True)
+        r.raise_for_status()
         with open(MODEL_PATH, "wb") as f:
             for chunk in r.iter_content(chunk_size=8192):
                 if chunk:
                     f.write(chunk)
         print("Model downloaded.")
 
-
 def load_model():
     global interpreter, input_details, output_details
-
     if interpreter is None:
         download_model()
         interpreter = tflite.Interpreter(model_path=MODEL_PATH)
@@ -39,15 +38,12 @@ def load_model():
         input_details = interpreter.get_input_details()
         output_details = interpreter.get_output_details()
 
-
 @app.post("/remove-bg")
 async def remove_bg(image: UploadFile = File(...)):
-
     load_model()
 
     contents = await image.read()
     img = Image.open(io.BytesIO(contents)).convert("RGB")
-
     img = img.resize((512, 512))
 
     input_data = np.array(img, dtype=np.float32) / 255.0
@@ -67,5 +63,4 @@ async def remove_bg(image: UploadFile = File(...)):
     buf.seek(0)
 
     gc.collect()
-
     return StreamingResponse(buf, media_type="image/png")
