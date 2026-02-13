@@ -1,5 +1,7 @@
+import os
 import io
 import gc
+import requests
 import numpy as np
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import StreamingResponse
@@ -8,15 +10,31 @@ import tflite_runtime.interpreter as tflite
 
 app = FastAPI()
 
+MODEL_URL = "HUGGINGFACE_LINK_BURAYA"
+MODEL_PATH = "u2net.tflite"
+
 interpreter = None
 input_details = None
 output_details = None
 
 
+def download_model():
+    if not os.path.exists(MODEL_PATH):
+        print("Downloading model...")
+        r = requests.get(MODEL_URL, stream=True)
+        with open(MODEL_PATH, "wb") as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+        print("Model downloaded.")
+
+
 def load_model():
     global interpreter, input_details, output_details
+
     if interpreter is None:
-        interpreter = tflite.Interpreter(model_path="u2net.tflite")
+        download_model()
+        interpreter = tflite.Interpreter(model_path=MODEL_PATH)
         interpreter.allocate_tensors()
         input_details = interpreter.get_input_details()
         output_details = interpreter.get_output_details()
@@ -30,7 +48,6 @@ async def remove_bg(image: UploadFile = File(...)):
     contents = await image.read()
     img = Image.open(io.BytesIO(contents)).convert("RGB")
 
-    # RAM için resize limit
     img = img.resize((512, 512))
 
     input_data = np.array(img, dtype=np.float32) / 255.0
