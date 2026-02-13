@@ -10,7 +10,7 @@ import tflite_runtime.interpreter as tflite
 
 app = FastAPI()
 
-MODEL_URL = "HUGGINGFACE_LINK_BURAYA"
+MODEL_URL = "https://huggingface.co/aykutsen1987/bgmeta-u2net/blob/main/u2net.tflite"
 MODEL_PATH = "u2net.tflite"
 
 interpreter = None
