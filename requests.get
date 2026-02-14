@@ -1,6 +1,0 @@
-from huggingface_hub import hf_hub_download
-
-file_path = hf_hub_download(
-    repo_id="aykutsen1987/bgmeta-u2net",
-    filename="u2net.tflite"
-)
