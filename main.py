@@ -65,6 +65,7 @@ async def remove_bg(image: UploadFile = File(...)):
     gc.collect()
     return StreamingResponse(buf, media_type="image/png")
 
-# main.py dosyasının en sonuna ekle
+# main.py dosyasının en altına ekle
 if __name__ == "__main__":
-    load_model()
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=10000)
