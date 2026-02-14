@@ -64,3 +64,7 @@ async def remove_bg(image: UploadFile = File(...)):
 
     gc.collect()
     return StreamingResponse(buf, media_type="image/png")
+
+# main.py dosyasının en sonuna ekle
+if __name__ == "__main__":
+    load_model()
