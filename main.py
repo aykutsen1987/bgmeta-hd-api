@@ -11,7 +11,7 @@ import tflite_runtime.interpreter as tflite
 app = FastAPI()
 
 # Doğrudan indirilebilir Hugging Face linki
-MODEL_URL = "https://huggingface.co/aykutsen1987/bgmeta-u2net/resolve/main/u2net.tflite"
+MODEL_URL = "https://huggingface.co/aykutsen1987/bgmeta-u2net/resolve/main/u2net.tflite?download=true"
 MODEL_PATH = "u2net.tflite"
 
 interpreter = None
